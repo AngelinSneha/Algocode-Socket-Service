@@ -23,19 +23,20 @@ io.on("connection", (socket) => {
     })
 });
 // call this API from the submission service when evaluation queue is done, then fetch this and diplay accordingly on frontend
-app.post('/sendPaload', async (req, res) => {
+app.post('/sendPayload', async (req, res) => {
     const { userId, payload } = req.body;
     if (!userId || !payload) {
-        res.status(400).send("Invalid Request");
+        return res.status(400).send("Invalid Request");
     }
     const socketId = await redisCache.get(userId);
     if (socketId) {
         io.to(socketId).emit('submissionPayloadResponse', payload);
-        res.send("Payload sent successfully");
+        return res.send("Payload sent successfully");
     } else {
-        res.status(404).send("User not connected")
+        return res.status(404).send("User not connected");
     }
-})
+});
+
 
 httpServer.listen(process.env.PORT, () => {
     console.log(`Server on port ${process.env.PORT}`)
